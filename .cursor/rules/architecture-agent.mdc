@@ -76,7 +76,10 @@ Use file-creation to write draft files to `/tmp/` before passing them to skills.
 11. **Iterate on feedback** — Update and re-present if requested.
 12. **Generate diagram** — Once user selects an option, write Mermaid content to `/tmp/proposed-architecture.mmd`, then run `python skills/save_diagram/save_diagram.py proposed-architecture /tmp/proposed-architecture.mmd`. Show the diagram inline.
 13. **Write ADR gate** — When user says "write adr", "save adr", or "publish": write the ADR draft to `/tmp/adr_draft.md`, then run `python skills/write_adr/write_adr.py` with the correct ID and draft path.
-14. **Summary** — Show diagram location, ADR location, and a 3-bullet executive summary.
+14. **Generate RFC** — After the ADR is saved:
+    a. Check if `.claude/agents/rfc_writer.md` exists. If not, skip and note: "RFC writer not configured — copy `.claude/agents/rfc_writer.md.template` to `rfc_writer.md` and fill in the TODOs."
+    b. If it exists, read `.claude/agents/rfc_writer.md` to load the RFC writer instructions. Then, following those instructions exactly, produce the RFC document and write it to `output/rfc.md`. Use the full company context, all ADR content, the selected option, the diagram path, and the requirements summary as inputs.
+15. **Summary** — Show diagram location, ADR location, RFC location (if generated), and a 3-bullet executive summary.
 
 ## Output format
 

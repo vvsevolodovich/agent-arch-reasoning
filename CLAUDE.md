@@ -51,6 +51,11 @@ Do not start the workflow for unrelated questions.
   Pass in specific questions about business priorities, budget tolerance, timeline constraints, or acceptable downtime.
   Wait for the response before proceeding.
 
+- **rfc_writer** — use the Agent tool with `subagent_type: "rfc_writer"` to produce a complete RFC document once the ADR has been written.
+  Pass in: company context, all ADR content (existing + new), the selected option description, the diagram path, and a summary of requirements gathered from the founder.
+  The subagent writes `output/rfc.md`.
+  Wait for completion before presenting the final summary.
+
 ### Optional tools (if available in your runtime)
 - Read — for reading company context, diagrams, and draft files.
 - Write — for writing draft ADR or diagram files to /tmp/ before passing them to skills.
@@ -96,7 +101,17 @@ Do not start the workflow for unrelated questions.
     b. Run `write_adr` with the correct ID (next in sequence), title, and draft file path.
     c. Confirm the file was saved and show its location.
 
-14. **Summary** — Present the final output: diagram location, ADR location, and a 3-bullet executive summary suitable for sharing with the founder.
+14. **RFC guard + generate RFC** — After the ADR is saved:
+    a. Check that `.claude/agents/rfc_writer.md` exists. If it does not, skip RFC generation and note: "RFC writer subagent not configured — skipping. Copy `.claude/agents/rfc_writer.md.template` to `rfc_writer.md` and fill in the TODOs to enable this step."
+    b. If it exists, invoke the `rfc_writer` subagent. Pass in:
+       - Full text of `data/context/company.md`
+       - Full content of all ADRs read during this session (existing + the new one just written)
+       - The selected architecture option description (name, summary, pros, cons, cost, timeline)
+       - Path to the saved diagram: `output/diagrams/proposed-architecture.mmd`
+       - A bullet-point summary of requirements gathered from the founder (or from company.md if no founder session occurred)
+    c. Wait for the subagent to complete. Confirm `output/rfc.md` was created.
+
+15. **Summary** — Present the final output: diagram location, ADR location, RFC location (if generated), and a 3-bullet executive summary suitable for sharing with the founder.
 
 ## Output format
 
@@ -206,4 +221,6 @@ Author: Architecture Reasoning Agent
 - **`save_diagram` fails:** Print the Mermaid content directly in the response with a note to save it manually.
 - **`write_adr` fails validation (missing sections):** Show the error, fix the draft, and retry once.
 - **`write_adr` fails (other error):** Report the error and offer to display the ADR content for manual saving.
+- **`rfc_writer` subagent not configured:** Skip RFC generation, print the template reminder (step 14a), and proceed to the summary.
+- **`rfc_writer` subagent fails or produces no output:** Report the error, show what context was passed, and offer to retry.
 - **Company context file missing:** Stop and ask the user to describe the business situation before proceeding.

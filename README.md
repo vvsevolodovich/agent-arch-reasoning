@@ -118,6 +118,57 @@ Open Copilot Chat → type: `analyse the architecture`
 
 ---
 
+---
+
+## Step 4 — Add the RFC writer subagent
+
+After the agent can produce a diagram and ADR, your task is to configure the subagent that turns all that output into a complete RFC document.
+
+### What the RFC writer receives (from the main agent)
+- Company context (`data/context/company.md`)
+- All ADR content — existing ADRs + the new one just written
+- The selected architecture option (name, summary, pros/cons, cost, timeline)
+- Path to the saved diagram (`output/diagrams/`)
+- Requirements summary from the founder session
+
+### What you need to do
+
+1. Copy the template:
+
+```bash
+cp .claude/agents/rfc_writer.md.template .claude/agents/rfc_writer.md
+```
+
+2. Fill in every `[TODO]` in `rfc_writer.md`:
+
+| Section | What to write |
+|---|---|
+| **Your role** | One-sentence identity for the RFC writer agent |
+| **Purpose** | What document it produces and who reads it |
+| **RFC sections** | Ordered list of sections the RFC must contain |
+| **Output format** | How each section is structured (tables, bullets, length) |
+| **Guardrails** | What the agent must never do (invent requirements, skip sections, etc.) |
+
+3. Re-run the full workflow and trigger the RFC:
+
+```
+analyse the architecture
+```
+
+After the ADR is written, the agent will automatically invoke `rfc_writer` and save the result to `output/rfc.md`.
+
+### Hint: RFC sections to consider
+
+A complete architecture RFC typically covers: Summary · Motivation · Business Requirements · Non-Functional Requirements · Proposed Architecture · Architecture Diagram · ADR References · Migration Plan · Risks & Mitigations · Open Questions · Alternatives Considered.
+
+You decide which sections are required and what level of detail each needs.
+
+### Cursor / Windsurf note
+
+There is no native subagent support in Cursor or Windsurf. The agent reads `.claude/agents/rfc_writer.md` directly and follows its instructions inline. The participant experience is the same — fill in the template, re-run the workflow, get `output/rfc.md`.
+
+---
+
 ## Key IDE differences
 
 | Feature | Claude Code | Cursor | Windsurf | Copilot |
