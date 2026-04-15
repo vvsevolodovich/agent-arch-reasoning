@@ -1,0 +1,23 @@
+graph TD
+    Web["Web App\n(React)"] --> CF
+    iOS["iOS App\n(React Native)"] --> CF
+    Android["Android App\n(React Native)"] --> CF
+
+    CF["Cloudflare CDN"] --> Nginx
+
+    subgraph VPS["Single VPS — Hetzner Frankfurt (€240/mo)"]
+        Nginx["Nginx\n(reverse proxy / TLS)"]
+        Nginx --> App
+
+        App["Node.js Monolith\n(Express.js, ~45k LOC)\nOrders | Restaurants | Couriers\nNotifications | Payments | Auth"]
+
+        App --> PG[("PostgreSQL 14\n(single instance)")]
+        App --> Redis[("Redis 7\n(single instance)")]
+    end
+
+    App --> Stripe["Stripe\n(payments)"]
+    App --> Twilio["Twilio\n(SMS)"]
+    App --> GoogleMaps["Google Maps API\n(geocoding / routing)"]
+
+    style VPS fill:#ffe0e0,stroke:#cc0000,stroke-width:2px
+    style App fill:#fff3cd,stroke:#856404
