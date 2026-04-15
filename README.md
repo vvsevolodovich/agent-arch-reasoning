@@ -120,7 +120,7 @@ Open Copilot Chat → type: `analyse the architecture`
 
 ---
 
-## Step 4 — Add the RFC writer subagent
+## Step 3 — Add the RFC writer subagent
 
 After the agent can produce a diagram and ADR, your task is to configure the subagent that turns all that output into a complete RFC document.
 
